@@ -1,29 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#080d08"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>FitTrack</title>
 
+<!-- PWA Manifest inline -->
+<script>
+const manifestData = {
+  name: "FitTrack — Your Fitness Journey",
+  short_name: "FitTrack",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#080d08",
+  theme_color: "#080d08",
+  icons: [{
+    src: "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%23080d08'/><text x='96' y='130' font-size='110' text-anchor='middle'>🏋️</text></svg>`),
+    sizes: "192x192", type: "image/svg+xml", purpose: "any maskable"
+  }]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type:"application/json"});
+const link = document.createElement("link");
+link.rel = "manifest"; link.href = URL.createObjectURL(blob);
+document.head.appendChild(link);
+</script>
 
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080d08; --bg2: #0e150e; --bg3: #131f13;
+  --green: #4ade80; --yellow: #facc15; --blue: #60a5fa;
+  --purple: #c084fc; --orange: #f97316; --red: #f87171;
+  --text: #e8f5e8; --text2: #86a886; --text3: #374737; --text4: #2a3a2a;
+  --border: #1a2a1a; --border2: #0f1f0f;
+  --font-serif: 'Georgia', serif;
+  --font-mono: 'Courier New', monospace;
+  --font-sans: -apple-system, 'Helvetica Neue', sans-serif;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+html, body { background: var(--bg); color: var(--text); font-family: var(--font-serif); min-height: 100vh; overflow-x: hidden; }
+input, button, select { font-family: inherit; }
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+input[type=date] { color-scheme: dark; }
+a { color: var(--green); }
 
+/* ── Layout ── */
+.page { display: none; padding: 1.3rem 1rem calc(5rem + var(--safe-bottom)) 1rem; animation: fadeUp 0.28s ease; max-width: 480px; margin: 0 auto; }
+.page.active { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 
+/* ── Nav ── */
+nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px;
+  background: var(--bg); border-top: 1px solid var(--border2); display: flex; z-index: 200;
+  padding-bottom: var(--safe-bottom); }
+nav button { flex: 1; background: none; border: none; padding: .7rem .5rem .55rem; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: var(--text4); transition: color .2s; border-top: 2px solid transparent; margin-top: -1px; }
+nav button.active { color: var(--green); border-top-color: var(--green); }
+nav button .ni { font-size: 1.2rem; }
+nav button .nl { font-size: .58rem; font-family: var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
 
+/* ── Cards ── */
+.card { background: rgba(255,255,255,.025); border: 1px solid var(--border); border-radius: 18px; padding: 1.2rem; margin-bottom: .9rem; }
+.card-label { font-size: .6rem; color: var(--text3); font-family: var(--font-mono); letter-spacing: .18em; text-transform: uppercase; margin-bottom: .5rem; }
 
+/* ── Buttons ── */
+.btn { width: 100%; border-radius: 14px; padding: .9rem; font-size: .9rem; font-family: var(--font-sans); font-weight: 700; cursor: pointer; letter-spacing: .04em; transition: all .2s; border: 2px solid; }
+.btn-green { background: var(--green); color: #050a05; border-color: var(--green); }
+.btn-green:active { background: #22c55e; }
+.btn-outline { background: rgba(74,222,128,.08); color: var(--green); border-color: var(--green); }
+.btn-outline:active { background: rgba(74,222,128,.18); }
+.btn-done { background: rgba(74,222,128,.12); color: var(--green); border-color: var(--green); }
+.btn-sm { padding: .55rem 1rem; font-size: .78rem; width: auto; }
 
+/* ── Inputs ── */
+.inp { width: 100%; background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 12px; padding: .78rem 1rem; color: var(--text); font-size: 1rem; font-family: var(--font-sans); outline: none; transition: border-color .2s; }
+.inp:focus { border-color: rgba(74,222,128,.5); }
 
-—
-STREAK
-—
-30-DAY
-—
-WEIGHT
-THIS WEEK
-GOOGLE FIT — WEIGHT
+/* ── Chips ── */
+.chip { display: inline-flex; align-items: center; gap: .3rem; border-radius: 20px; padding: .22rem .75rem; font-size: .68rem; font-family: var(--font-mono); letter-spacing: .06em; border: 1px solid; }
 
-FITBIT — HEART METRICS
+/* ── Progress bar ── */
+.prog-wrap { background: var(--border2); border-radius: 6px; height: 7px; overflow: hidden; }
+.prog-bar { height: 100%; border-radius: 6px; transition: width .8s ease; }
 
-🏠
-TODAY
-📝
-LOG
-📊
-STATS
-📅
-HISTORY
-⚙️
-SETUP
+/* ── Toast ── */
+#toast { position: fixed; top: 1.2rem; left: 50%; transform: translateX(-50%) translateY(-120%); background: #1a3a1a; border: 1px solid var(--green); border-radius: 12px; padding: .6rem 1.2rem; font-size: .82rem; font-family: var(--font-sans); color: var(--green); z-index: 999; transition: transform .35s cubic-bezier(.34,1.56,.64,1); white-space: nowrap; }
+#toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── Header ── */
+.page-eyebrow { font-size: .62rem; color: var(--green); font-family: var(--font-mono); letter-spacing: .22em; text-transform: uppercase; margin-bottom: .25rem; }
+.page-title { font-size: 1.55rem; font-weight: 400; color: #f0fdf0; margin-bottom: 1.4rem; letter-spacing: -.02em; }
+
+/* ── Check-in Button Pulse ── */
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.35)} 50%{box-shadow:0 0 0 10px rgba(74,222,128,0)} }
+.btn-pulse { animation: pulse 2s infinite; }
+@keyframes pop { 0%{transform:scale(.5);opacity:0} 65%{transform:scale(1.15)} 100%{transform:scale(1);opacity:1} }
+.pop { animation: pop .5s cubic-bezier(.34,1.56,.64,1); }
+
+/* ── Modal ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 300; align-items: center; justify-content: center; padding: 1.5rem; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 22px; padding: 1.5rem; width: 100%; max-width: 420px; }
+.modal h3 { font-size: 1.1rem; font-weight: 400; color: #f0fdf0; margin-bottom: .8rem; }
+
+/* ── Setup wizard ── */
+.setup-step { display: none; }
+.setup-step.active { display: block; }
+.setup-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--green); color: #050a05; font-size: .8rem; font-family: var(--font-sans); font-weight: 700; margin-right: .6rem; }
+code { background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.15); border-radius: 6px; padding: .1rem .4rem; font-family: var(--font-mono); font-size: .82rem; color: var(--green); }
+
+/* ── Gfit badge ── */
+.gfit-badge { display: flex; align-items: center; gap: .5rem; padding: .5rem .8rem; border-radius: 10px; font-size: .78rem; font-family: var(--font-sans); }
+.gfit-badge.connected { background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.2); color: var(--green); }
+.gfit-badge.disconnected { background: rgba(148,163,184,.06); border: 1px solid rgba(148,163,184,.15); color: #64748b; }
+
+/* ── Stat grid ── */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .6rem; }
+.stat-box { background: rgba(255,255,255,.025); border: 1px solid var(--border); border-radius: 14px; padding: .85rem .5rem; text-align: center; }
+.stat-val { font-size: 1.15rem; font-weight: 700; font-family: var(--font-sans); letter-spacing: -.01em; }
+.stat-lbl { font-size: .58rem; color: var(--text3); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .08em; margin-top: .1rem; }
+
+/* ── Week strip ── */
+.week-strip { display: flex; gap: .25rem; }
+.week-day { flex: 1; text-align: center; padding: .35rem .05rem; border-radius: 8px; border: 1px solid transparent; }
+.week-day .wd-icon { font-size: .85rem; margin-bottom: 2px; }
+.week-day .wd-lbl { font-size: .58rem; font-family: var(--font-mono); }
+
+/* ── Chart ── */
+.chart-wrap { overflow: hidden; }
+
+/* ── History grid ── */
+.hist-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.hist-day { aspect-ratio: 1; border-radius: 7px; display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; font-family: var(--font-mono); cursor: pointer; border: 1px solid var(--border2); color: var(--text4);
+  background: rgba(255,255,255,.02); transition: all .15s; user-select: none; }
+.hist-day.done { color: inherit; }
+.hist-day.today { border-color: rgba(74,222,128,.4); }
+.hist-day.future { opacity: .25; cursor: default; }
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- Google Fit Setup Modal -->
+<div class="modal-overlay" id="gfitModal">
+  <div class="modal">
+    <h3>🔗 Connect Google Fit</h3>
+    <p style="font-size:.82rem;color:var(--text2);font-family:var(--font-sans);line-height:1.6;margin-bottom:1.1rem;">
+      To auto-sync your weight from Omron → Google Fit, you need a free Google Cloud API key (one-time, ~5 min setup).
+    </p>
+    <div class="setup-step active" id="step1">
+      <div style="margin-bottom:.9rem">
+        <span class="setup-num">1</span><span style="font-size:.85rem;color:var(--text2);font-family:var(--font-sans)">Open <strong style="color:var(--text)">console.cloud.google.com</strong></span>
+      </div>
+      <div style="margin-bottom:.9rem">
+        <span class="setup-num">2</span><span style="font-size:.85rem;color:var(--text2);font-family:var(--font-sans)">Create a new project (any name)</span>
+      </div>
+      <div style="margin-bottom:.9rem">
+        <span class="setup-num">3</span><span style="font-size:.85rem;color:var(--text2);font-family:var(--font-sans)">APIs & Services → Enable <strong style="color:var(--text)">Fitness API</strong></span>
+      </div>
+      <div style="margin-bottom:.9rem">
+        <span class="setup-num">4</span><span style="font-size:.85rem;color:var(--text2);font-family:var(--font-sans)">Credentials → Create → <strong style="color:var(--text)">OAuth 2.0 Client ID</strong> → Web Application</span>
+      </div>
+      <div style="margin-bottom:1.2rem">
+        <span class="setup-num">5</span><span style="font-size:.85rem;color:var(--text2);font-family:var(--font-sans)">Add your app URL to <strong style="color:var(--text)">Authorised JavaScript Origins</strong></span>
+      </div>
+      <div style="margin-bottom:.5rem;font-size:.75rem;color:var(--text3);font-family:var(--font-sans)">Paste your Client ID here:</div>
+      <input class="inp" id="clientIdInput" placeholder="xxxxxx.apps.googleusercontent.com" style="margin-bottom:1rem;font-size:.82rem"/>
+      <div style="display:flex;gap:.6rem">
+        <button class="btn btn-outline btn-sm" onclick="closeGfitModal()">Cancel</button>
+        <button class="btn btn-green btn-sm" onclick="saveClientId()">Save & Connect</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fitbit Setup Modal -->
+<div class="modal-overlay" id="fitbitModal">
+  <div class="modal">
+    <h3>❤️ Connect Fitbit</h3>
+    <p style="font-size:.82rem;color:var(--text2);font-family:var(--font-sans);line-height:1.6;margin-bottom:1.1rem;">
+      Syncs RHR and HRV automatically from your Fitbit. One-time setup (~5 min) at <strong style="color:var(--text)">dev.fitbit.com</strong>.
+    </p>
+    <div style="margin-bottom:.9rem">
+      <span class="setup-num">1</span><span style="font-size:.85rem;color:var(--text2);font-family:var(--font-sans)">Go to <strong style="color:var(--text)">dev.fitbit.com/apps/new</strong></span>
+    </div>
+    <div style="margin-bottom:.9rem">
+      <span class="setup-num">2</span><span style="font-size:.85rem;color:var(--text2);font-family:var(--font-sans)">Fill in any app name. Set <strong style="color:var(--text)">OAuth 2.0 Application Type → Client</strong></span>
+    </div>
+    <div style="margin-bottom:.9rem">
+      <span class="setup-num">3</span><span style="font-size:.85rem;color:var(--text2);font-family:var(--font-sans)">Set <strong style="color:var(--text)">Callback URL</strong> to your GitHub Pages app URL</span>
+    </div>
+    <div style="margin-bottom:1.2rem">
+      <span class="setup-num">4</span><span style="font-size:.85rem;color:var(--text2);font-family:var(--font-sans)">Copy your <strong style="color:var(--text)">OAuth 2.0 Client ID</strong> (short code like <code>23ABCD</code>)</span>
+    </div>
+    <div style="margin-bottom:.5rem;font-size:.75rem;color:var(--text3);font-family:var(--font-sans)">Paste your Fitbit Client ID here:</div>
+    <input class="inp" id="fitbitClientIdInput" placeholder="e.g. 23ABCD" style="margin-bottom:1rem;font-size:.88rem;letter-spacing:.08em"/>
+    <div style="display:flex;gap:.6rem">
+      <button class="btn btn-outline btn-sm" onclick="closeFitbitModal()">Cancel</button>
+      <button class="btn btn-green btn-sm" onclick="saveFitbitClientId()">Save & Authorise</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pages -->
+<div class="page active" id="page-today">
+  <div id="today-eyebrow" class="page-eyebrow"></div>
+  <div id="today-greeting" style="font-size:1.65rem;font-weight:400;color:#f0fdf0;line-height:1.15;margin-bottom:.7rem"></div>
+  <div id="phase-chip" style="margin-bottom:1.4rem"></div>
+
+  <!-- Workout card -->
+  <div id="workout-card" class="card" style="position:relative;overflow:hidden">
+    <div id="wc-bg-icon" style="position:absolute;top:-12px;right:-12px;font-size:5.5rem;opacity:.055;pointer-events:none;line-height:1"></div>
+    <div id="wc-eyebrow" class="card-label"></div>
+    <div id="wc-title" style="font-size:1.25rem;color:#f0fdf0;margin-bottom:.4rem"></div>
+    <div id="wc-detail" style="font-size:.8rem;color:var(--text2);font-family:var(--font-sans);line-height:1.65;margin-bottom:1.2rem"></div>
+    <button id="checkin-btn" class="btn" onclick="toggleCheckin()"></button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stat-grid" style="margin-bottom:.9rem">
+    <div class="stat-box"><div class="stat-val" id="s-streak" style="color:var(--orange)">—</div><div class="stat-lbl">Streak</div></div>
+    <div class="stat-box"><div class="stat-val" id="s-comp" style="color:var(--blue)">—</div><div class="stat-lbl">30-Day</div></div>
+    <div class="stat-box"><div class="stat-val" id="s-weight" style="color:var(--green)">—</div><div class="stat-lbl">Weight</div></div>
+  </div>
+
+  <!-- Week strip -->
+  <div class="card" style="padding:.9rem 1rem">
+    <div class="card-label">This Week</div>
+    <div class="week-strip" id="week-strip"></div>
+  </div>
+
+  <!-- Google Fit card -->
+  <div class="card" id="gfit-card">
+    <div class="card-label">Google Fit — Weight</div>
+    <div id="gfit-status"></div>
+    <div id="gfit-data" style="display:none;margin-top:.75rem;display:none">
+      <div style="display:flex;gap:.7rem;flex-wrap:wrap">
+        <span id="gf-weight" style="font-size:.8rem;font-family:var(--font-sans);color:var(--green)"></span>
+        <span id="gf-steps" style="font-size:.8rem;font-family:var(--font-sans);color:var(--blue)"></span>
+        <span id="gf-calories" style="font-size:.8rem;font-family:var(--font-sans);color:var(--yellow)"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fitbit card -->
+  <div class="card" id="fitbit-card">
+    <div class="card-label">Fitbit — Heart Metrics</div>
+    <div id="fitbit-status"></div>
+    <div id="fitbit-data" style="display:none;margin-top:.75rem">
+      <div style="display:flex;gap:1.2rem;flex-wrap:wrap">
+        <div>
+          <div style="font-size:.6rem;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.15rem">RHR</div>
+          <span id="fb-rhr" style="font-size:1.2rem;font-weight:700;color:var(--red);font-family:var(--font-sans)"></span>
+          <span style="font-size:.7rem;color:var(--text3);font-family:var(--font-sans)"> bpm</span>
+        </div>
+        <div>
+          <div style="font-size:.6rem;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.15rem">HRV (RMSSD)</div>
+          <span id="fb-hrv" style="font-size:1.2rem;font-weight:700;color:var(--purple);font-family:var(--font-sans)"></span>
+          <span style="font-size:.7rem;color:var(--text3);font-family:var(--font-sans)"> ms</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-log">
+  <div class="page-eyebrow">Body Metrics</div>
+  <div class="page-title">Log Measurements</div>
+
+  <div class="card">
+    <div class="card-label" id="log-date-label"></div>
+
+    <div id="fitbit-rhr-section" style="display:none;margin-bottom:1.1rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">
+        <label style="font-size:.78rem;color:var(--text2);font-family:var(--font-sans)">Resting Heart Rate</label>
+        <span style="font-size:.68rem;color:var(--red);font-family:var(--font-mono)">from Fitbit</span>
+      </div>
+      <div id="fitbit-rhr-display" style="font-size:1.3rem;color:var(--red);font-family:var(--font-sans);font-weight:700;padding:.4rem 0"></div>
+    </div>
+
+    <div id="fitbit-hrv-section" style="display:none;margin-bottom:1.1rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">
+        <label style="font-size:.78rem;color:var(--text2);font-family:var(--font-sans)">HRV (RMSSD)</label>
+        <span style="font-size:.68rem;color:var(--purple);font-family:var(--font-mono)">from Fitbit</span>
+      </div>
+      <div id="fitbit-hrv-display" style="font-size:1.3rem;color:var(--purple);font-family:var(--font-sans);font-weight:700;padding:.4rem 0"></div>
+    </div>
+
+    <div id="gfit-weight-section" style="display:none;margin-bottom:1.1rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">
+        <label style="font-size:.78rem;color:var(--text2);font-family:var(--font-sans)">Weight <span style="color:var(--text3)">(kg)</span></label>
+        <span style="font-size:.68rem;color:var(--green);font-family:var(--font-mono)">from Google Fit</span>
+      </div>
+      <div id="gfit-weight-display" style="font-size:1.3rem;color:var(--green);font-family:var(--font-sans);font-weight:700;padding:.5rem 0"></div>
+    </div>
+
+    <div id="manual-weight-section">
+      <div style="display:flex;justify-content:space-between;margin-bottom:.3rem">
+        <label style="font-size:.78rem;color:var(--text2);font-family:var(--font-sans)">Weight <span style="color:var(--text3)">(kg)</span></label>
+        <span style="font-size:.68rem;color:var(--text3);font-family:var(--font-mono)">target: 80</span>
+      </div>
+      <input class="inp" id="logWeight" type="number" step="0.1" placeholder="e.g. 89.5" style="margin-bottom:1rem"/>
+    </div>
+
+    <div style="margin-bottom:1rem">
+      <div style="display:flex;justify-content:space-between;margin-bottom:.3rem">
+        <label style="font-size:.78rem;color:var(--text2);font-family:var(--font-sans)">Body Fat <span style="color:var(--text3)">(%)</span></label>
+        <span style="font-size:.68rem;color:var(--text3);font-family:var(--font-mono)">target: 25%</span>
+      </div>
+      <input class="inp" id="logBF" type="number" step="0.1" placeholder="e.g. 33.0"/>
+    </div>
+
+    <div style="margin-bottom:1.3rem">
+      <div style="display:flex;justify-content:space-between;margin-bottom:.3rem">
+        <label style="font-size:.78rem;color:var(--text2);font-family:var(--font-sans)">Visceral Fat <span style="color:var(--text3)">(score)</span></label>
+        <span style="font-size:.68rem;color:var(--text3);font-family:var(--font-mono)">target: 12</span>
+      </div>
+      <input class="inp" id="logVF" type="number" step="1" placeholder="e.g. 16"/>
+      <div style="font-size:.68rem;color:var(--text3);font-family:var(--font-sans);margin-top:.35rem">📱 Check your Omron Connect app for this value</div>
+    </div>
+
+    <button class="btn btn-green" onclick="saveMeasure()" id="save-btn">Save Measurement</button>
+  </div>
+
+  <div id="recent-entries"></div>
+</div>
+
+<div class="page" id="page-stats">
+  <div class="page-eyebrow">Overview</div>
+  <div class="page-title">Progress</div>
+
+  <div class="card">
+    <div class="card-label">Goals — Target June 2027</div>
+    <div id="goal-bars"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.9rem" id="stats-grid2"></div>
+
+  <div id="charts-section"></div>
+</div>
+
+<div class="page" id="page-history">
+  <div class="page-eyebrow">Calendar</div>
+  <div class="page-title">Workout History</div>
+
+  <div class="card">
+    <div class="card-label">Programme Start Date</div>
+    <input class="inp" type="date" id="startDateInput" onchange="saveStartDate(this.value)" style="font-family:var(--font-mono);font-size:.9rem;color:var(--green)"/>
+  </div>
+
+  <div class="card">
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:.4rem">
+      <div style="text-align:center;font-size:.58rem;color:var(--text4);font-family:var(--font-mono);padding-bottom:.35rem">Su</div>
+      <div style="text-align:center;font-size:.58rem;color:var(--text4);font-family:var(--font-mono);padding-bottom:.35rem">Mo</div>
+      <div style="text-align:center;font-size:.58rem;color:var(--text4);font-family:var(--font-mono);padding-bottom:.35rem">Tu</div>
+      <div style="text-align:center;font-size:.58rem;color:var(--text4);font-family:var(--font-mono);padding-bottom:.35rem">We</div>
+      <div style="text-align:center;font-size:.58rem;color:var(--text4);font-family:var(--font-mono);padding-bottom:.35rem">Th</div>
+      <div style="text-align:center;font-size:.58rem;color:var(--text4);font-family:var(--font-mono);padding-bottom:.35rem">Fr</div>
+      <div style="text-align:center;font-size:.58rem;color:var(--text4);font-family:var(--font-mono);padding-bottom:.35rem">Sa</div>
+    </div>
+    <div class="hist-grid" id="hist-grid"></div>
+    <div style="margin-top:.9rem;display:flex;gap:.7rem;flex-wrap:wrap" id="hist-legend"></div>
+  </div>
+
+  <div class="card" id="alltime-card">
+    <div class="card-label">All Time</div>
+    <div id="alltime-stats" style="display:flex;gap:1.5rem"></div>
+  </div>
+</div>
+
+<!-- Setup Page -->
+<div class="page" id="page-setup">
+  <div class="page-eyebrow">Integrations &amp; Settings</div>
+  <div class="page-title">Setup</div>
+
+  <!-- Programme start -->
+  <div class="card" style="margin-bottom:.9rem">
+    <div class="card-label">Programme Start Date</div>
+    <input class="inp" type="date" id="setupStartDate" onchange="saveStartDate(this.value)" style="font-family:var(--font-mono);font-size:.9rem;color:var(--green)"/>
+  </div>
+
+  <!-- Google Fit -->
+  <div class="card" style="margin-bottom:.9rem">
+    <div class="card-label" style="color:var(--green)">Google Fit — Weight, Steps &amp; Calories</div>
+    <div id="setup-gfit-status"></div>
+    <div id="setup-gfit-data" style="display:none;margin-top:.6rem;font-size:.8rem;font-family:var(--font-sans);color:var(--text2)">
+      Latest: <span id="sgf-weight"></span> · <span id="sgf-steps"></span>
+    </div>
+  </div>
+
+  <!-- Fitbit -->
+  <div class="card" style="margin-bottom:.9rem">
+    <div class="card-label" style="color:var(--red)">Fitbit — RHR &amp; HRV</div>
+    <div id="setup-fitbit-status"></div>
+    <div id="setup-fitbit-data" style="display:none;margin-top:.6rem">
+      <div style="display:flex;gap:1.2rem">
+        <div><div style="font-size:.6rem;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.1em">RHR</div><span id="sfb-rhr" style="font-size:1.1rem;font-weight:700;color:var(--red);font-family:var(--font-sans)"></span><span style="font-size:.7rem;color:var(--text3);font-family:var(--font-sans)"> bpm</span></div>
+        <div><div style="font-size:.6rem;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.1em">HRV</div><span id="sfb-hrv" style="font-size:1.1rem;font-weight:700;color:var(--purple);font-family:var(--font-sans)"></span><span style="font-size:.7rem;color:var(--text3);font-family:var(--font-sans)"> ms</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Calendar -->
+  <div class="card">
+    <div class="card-label" style="color:var(--blue)">Google Calendar — Workout Schedule</div>
+    <p style="font-size:.8rem;color:var(--text2);font-family:var(--font-sans);line-height:1.6;margin-bottom:.9rem">
+      Creates 4 weeks of workout events in your Google Calendar, automatically tuned to your current training phase and preferred session times.
+    </p>
+
+    <!-- Time picker -->
+    <div style="margin-bottom:1rem">
+      <div style="font-size:.7rem;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">Preferred Gym Time</div>
+      <div style="display:flex;gap:.5rem">
+        <button id="time-8am"  onclick="setGymTime('08:00','time-8am')"  class="btn btn-outline btn-sm" style="flex:1">🌅 8:00 AM</button>
+        <button id="time-12pm" onclick="setGymTime('12:00','time-12pm')" class="btn btn-outline btn-sm" style="flex:1">☀️ 12:00 PM</button>
+        <button id="time-6pm"  onclick="setGymTime('18:30','time-6pm')"  class="btn btn-outline btn-sm" style="flex:1">🌆 6:30 PM</button>
+      </div>
+    </div>
+
+    <button class="btn btn-outline" onclick="scheduleWorkouts()" id="cal-btn" style="border-color:var(--blue);color:var(--blue)">
+      📅 Schedule 4 Weeks
+    </button>
+    <div id="cal-status" style="margin-top:.6rem;font-size:.78rem;font-family:var(--font-sans);color:var(--text2)"></div>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav>
+  <button class="active" onclick="navTo('today',this)"><span class="ni">🏠</span><span class="nl">Today</span></button>
+  <button onclick="navTo('log',this)"><span class="ni">📝</span><span class="nl">Log</span></button>
+  <button onclick="navTo('stats',this)"><span class="ni">📊</span><span class="nl">Stats</span></button>
+  <button onclick="navTo('history',this)"><span class="ni">📅</span><span class="nl">History</span></button>
+  <button onclick="navTo('setup',this)"><span class="ni">⚙️</span><span class="nl">Setup</span></button>
+</nav>
+
+<script>
+// ── Constants ──────────────────────────────────────────
+const PLAN = [
+  { day:0, name:"Sunday",    icon:"🧘", label:"Yoga & Flexibility",  type:"yoga",     col:"#c084fc" },
+  { day:1, name:"Monday",    icon:"💪", label:"Upper Body Strength", type:"strength", col:"#facc15" },
+  { day:2, name:"Tuesday",   icon:"🚴", label:"Cycling — Cardio",    type:"cycling",  col:"#4ade80" },
+  { day:3, name:"Wednesday", icon:"🦵", label:"Lower Body Strength", type:"strength", col:"#facc15" },
+  { day:4, name:"Thursday",  icon:"🚶", label:"Active Recovery",     type:"recovery", col:"#94a3b8" },
+  { day:5, name:"Friday",    icon:"🏋️", label:"Full Body Strength",  type:"strength", col:"#facc15" },
+  { day:6, name:"Saturday",  icon:"🚴", label:"Long Ride",           type:"cycling",  col:"#4ade80" },
+];
+
+// Full phase-aware workout details [phase 0-3][day 0-6]
+const PHASE_DETAIL = [
+  // ── PHASE 1: Foundation (Months 1–3) ──────────────────
+  [
+    // Sunday — Yoga
+    `🕐 60 min · Beginner Hatha or Yin Yoga\n\n🧘 SEQUENCE:\n• Child's Pose — 2 min\n• Cat-Cow — 10 slow cycles\n• Downward Dog — hold 30s × 3\n• Low Lunge (Dragon) — 2 min each side\n• Pigeon Pose — 2 min each side (hip opener, very important for cyclists)\n• Seated Forward Fold — 2 min\n• Supine Spinal Twist — 90s each side\n• Bridge Pose — 3 × 10 reps\n• Savasana — 5 min\n\n🎯 Focus: hip flexors (tight from sitting), hamstrings, thoracic spine rotation\n💡 Use YouTube: Yoga with Adriene "Yoga for Beginners" or "Yin Yoga for Cyclists"`,
+
+    // Monday — Upper Body
+    `🕐 45 min · Upper Body Strength — Light & Form-Focused\n\n🔥 WARM-UP (5 min):\n• Arm circles 20 forward + 20 back\n• Band pull-aparts or doorframe chest stretch × 15\n• Light jumping jacks × 30\n\n💪 WORKOUT (3 sets, 90s rest between sets):\n• Push-ups: 3 × 10 (on knees if needed — no shame, form first)\n• Dumbbell Row: 3 × 12 each arm @ 5–8 kg\n• Dumbbell Shoulder Press: 3 × 12 @ 5–8 kg\n• Dumbbell Bicep Curls: 3 × 12 @ 5–8 kg\n• Lateral Raises: 3 × 12 @ 3–5 kg (slow, controlled)\n• Face Pulls / Band Pull-Apart: 3 × 15\n\n❄️ COOL-DOWN (5 min):\n• Chest doorframe stretch × 2 min\n• Cross-body shoulder stretch × 60s each\n\n⚠️ Stop if: sharp joint pain in shoulder or elbow`,
+
+    // Tuesday — Cycling
+    `🕐 30–35 min · Easy Zone 2 Ride · 15–18 km\n\n🚴 ROUTE: Flat, no significant hills. Park loop or flat road ideal.\n\n📊 TARGETS:\n• Distance: 15–18 km\n• Speed: 18–22 km/h (relaxed)\n• Heart Rate: 110–130 bpm (Zone 2)\n• Effort: You should be able to hold a full conversation. If you can't talk, slow down.\n\n🗺️ STRUCTURE:\n• 0–5 min: Easy warm-up spin, very low effort\n• 5–25 min: Steady Zone 2, maintain easy conversation pace\n• 25–30 min: Cool-down, reduce pace gradually\n\n💧 Bring: 500ml water\n💡 This is NOT meant to be hard. The point is building the aerobic base. Resist the urge to push.`,
+
+    // Wednesday — Lower Body
+    `🕐 45 min · Lower Body Strength — Light & Form-Focused\n\n🔥 WARM-UP (5 min):\n• Leg swings front/back × 15 each\n• Hip circles × 10 each direction\n• Bodyweight squats × 15 (slow)\n\n🦵 WORKOUT (3 sets, 90s rest):\n• Bodyweight Squats: 3 × 15 (focus: knees tracking over toes, chest up)\n• Dumbbell Lunges: 3 × 12 each leg @ 5–8 kg\n• Romanian Deadlift: 3 × 12 @ 8–10 kg (hingeat hips, back flat)\n• Glute Bridges: 3 × 15 (squeeze at top, 2s hold)\n• Calf Raises: 3 × 20 (slow down, quick up)\n• Plank: 3 × 20 seconds (build to 30s by week 6)\n\n❄️ COOL-DOWN (5 min):\n• Standing quad stretch × 60s each\n• Seated hamstring stretch × 60s each\n• Pigeon pose × 90s each\n\n⚠️ Knees: if squats cause knee pain, reduce depth to 45°`,
+
+    // Thursday — Recovery
+    `🕐 30–35 min · Active Recovery\n\n🚶 OPTION A — Brisk Walk:\n• Distance: 3–4 km\n• Pace: Brisk but comfortable (5–6 km/h)\n• Route: Any flat terrain — park, neighbourhood\n• Heart Rate: Under 110 bpm. This is NOT a workout.\n\n🚴 OPTION B — Easy Spin:\n• Distance: 10–12 km\n• Very easy pace, Zone 1 only\n• No hills whatsoever\n\n🧘 FINISH WITH (10 min):\n• Standing forward fold × 60s\n• Hip flexor kneeling lunge stretch × 90s each\n• Seated spinal twist × 60s each\n\n💡 Purpose: flush out lactic acid, keep joints mobile, don't stress the body. If you feel tired, just walk slowly. Rest is not failure.`,
+
+    // Friday — Full Body
+    `🕐 50 min · Full Body Strength — Functional Focus\n\n🔥 WARM-UP (5 min):\n• Jumping jacks × 30\n• Bodyweight squat × 10\n• Hip circles × 10\n\n🏋️ WORKOUT (3 sets, 90s rest):\n• Goblet Squat: 3 × 12 @ 8–10 kg (dumbbell or kettlebell held at chest)\n• Dumbbell Floor Press: 3 × 12 @ 8–10 kg each hand (if no bench)\n• Resistance Band or Dumbbell Row: 3 × 12 @ 8–10 kg\n• Plank Hold: 3 × 25 seconds\n• Glute Bridge: 3 × 15\n• Dumbbell Deadlift: 3 × 12 @ 10–12 kg\n\n❄️ COOL-DOWN (5 min):\n• Child's pose × 2 min\n• Lying spinal twist × 60s each\n\n💡 This session ties upper and lower body together. Keep rest periods consistent — set a timer.`,
+
+    // Saturday — Long Ride
+    `🕐 60–75 min · Long Ride · 30–38 km\n\n🚴 ROUTE: Flat to very gently rolling terrain. Avoid steep hills entirely this phase.\n\n📊 TARGETS:\n• Distance: 30–38 km\n• Speed: 18–22 km/h average\n• Heart Rate: 120–140 bpm (Zone 2–3)\n• Effort: Comfortably challenging. You can talk in short sentences.\n\n🗺️ STRUCTURE:\n• 0–10 min: Easy warm-up spin\n• 10–55 min: Steady effort, enjoy the ride\n• 55–65 min: Reduce pace, cool-down spin\n\n🎒 BRING:\n• 750ml–1L water (drink every 15 min)\n• 1 banana or energy bar (eat at ~30 min mark)\n• Phone for maps/emergency\n\n💡 This is your main fat-burning session of the week. Consistency here drives the biggest body composition changes.`,
+  ],
+
+  // ── PHASE 2: Build (Months 4–6) ───────────────────────
+  [
+    // Sunday — Yoga
+    `🕐 75 min · Intermediate Hatha or Vinyasa Yoga\n\n🧘 SEQUENCE:\n• Sun Salutation A — 5 rounds (warm-up)\n• Sun Salutation B — 3 rounds\n• Warrior I → Warrior II → Reverse Warrior — hold 45s each, both sides\n• Triangle Pose — 60s each side\n• Pigeon Pose — 3 min each side\n• Boat Pose (Navasana) — 3 × 20s (core)\n• Bridge Pose — 3 × 15 reps\n• Shoulder Stand or Legs Up Wall — 2 min\n• Supine Twist — 90s each side\n• Savasana — 5 min\n• Pranayama: Box breathing — 4 rounds (4s in, 4s hold, 4s out, 4s hold)\n\n🎯 Focus: full-body mobility, strength, breathwork. Sweat is expected.`,
+
+    // Monday — Upper Body
+    `🕐 55 min · Upper Body Strength — Progressive Overload\n\n🔥 WARM-UP (5 min):\n• Band pull-aparts × 20\n• Wall slides × 15\n• Light push-ups × 15\n\n💪 WORKOUT (4 sets, 75s rest):\n• Push-ups (standard): 4 × 12 (add weight vest if too easy)\n• Dumbbell Bench Press: 4 × 10 @ 10–14 kg each hand\n• Bent-Over Dumbbell Row: 4 × 10 @ 10–14 kg each arm\n• Dumbbell Overhead Press: 4 × 10 @ 8–12 kg\n• Lateral Raises: 3 × 12 @ 5–7 kg (strict form, no swinging)\n• Tricep Dips (chair/bench): 3 × 12\n• Face Pulls / Rear Delt Fly: 3 × 15 @ 5 kg\n\n❄️ COOL-DOWN (5 min)\n\n📈 Target: increase weight by 1–2 kg when you can complete all reps with good form for 2 sessions in a row`,
+
+    // Tuesday — Cycling Intervals
+    `🕐 35 min · Cycling Intervals · 20–25 km\n\n🚴 ROUTE: Flat or very slightly rolling. You need to be able to push hard safely.\n\n📊 INTERVAL STRUCTURE:\n• 0–5 min: Easy warm-up spin @ Zone 2\n• 5–29 min: 6 × INTERVALS:\n  — 2 min HARD (Zone 4: 155–170 bpm, cannot talk, ~28–32 km/h)\n  — 2 min EASY (Zone 2: back to 115–130 bpm)\n• 29–35 min: Easy cool-down spin\n\n🎯 HR targets during hard intervals: 155–170 bpm\n🎯 HR recovery during easy intervals: should drop below 140 bpm\n\n💧 Bring: 750ml water\n💡 The recovery between intervals is as important as the hard effort. Don't skip the easy minutes.`,
+
+    // Wednesday — Lower Body
+    `🕐 55 min · Lower Body Strength — Progressive Overload\n\n🔥 WARM-UP (5 min):\n• Leg swings × 15\n• Hip circles × 10\n• Goblet squat × 12 @ light weight\n\n🦵 WORKOUT (4 sets, 75s rest):\n• Goblet/Barbell Squat: 4 × 10 @ 15–22 kg total\n• Romanian Deadlift: 4 × 10 @ 16–22 kg (hinge at hips, back FLAT)\n• Walking Lunges: 3 × 12 each leg @ 8–12 kg dumbbells\n• Leg Press (machine): 3 × 15 @ moderate weight\n• Glute Hip Thrust: 3 × 12 @ 15–20 kg barbell across hips\n• Calf Raises: 4 × 20 (slow eccentric, 3s down)\n• Plank: 3 × 35 seconds\n\n❄️ COOL-DOWN (5 min): foam roll quads and IT band if available`,
+
+    // Thursday — Recovery + Core
+    `🕐 45 min · Active Recovery + Core Circuit\n\n🚶 PART 1 — Easy Movement (25 min):\n• Brisk walk: 4–5 km @ easy pace, OR\n• Easy cycling: 15 km @ Zone 1, no effort\n\n🔥 PART 2 — Core Circuit (15 min, 3 rounds, 30s rest between exercises):\n• Plank Hold: 35 seconds\n• Bicycle Crunches: 20 reps each side\n• Russian Twists: 20 reps each side @ 5 kg plate or dumbbell\n• Dead Bug: 10 reps each side (slow, controlled)\n• Side Plank: 25 seconds each side\n\n🧘 FINISH (5 min): hip flexor stretch + spinal twist\n\n💡 This Thursday core work is important — a strong core protects your lower back during cycling and lifting. Don't skip it.`,
+
+    // Friday — Full Body
+    `🕐 55 min · Full Body — Functional Strength\n\n🔥 WARM-UP (5 min)\n\n🏋️ WORKOUT (4 sets, 75s rest):\n• Kettlebell Swings: 4 × 15 @ 12–16 kg (hip drive, not arms)\n• Farmer's Carry: 3 × 30 metres @ 12–16 kg each hand (walk slowly, chest up)\n• TRX/Resistance Band Row: 4 × 12\n• Step-Ups onto bench/chair: 3 × 12 each leg @ 8–10 kg dumbbells\n• Push-Up to T-Rotation: 3 × 10 (push-up + rotate to side plank each rep)\n• Dumbbell Deadlift: 3 × 12 @ 14–18 kg\n\n❄️ COOL-DOWN (5 min)\n\n💡 Functional training = movements your body uses in real life. Farmer's carry is especially good for posture and core stability.`,
+
+    // Saturday — Long Ride
+    `🕐 75–90 min · Long Ride · 38–50 km\n\n🚴 ROUTE: Mix of flat and gentle-to-moderate hills (1–2 climbs of 1–2 km each).\n\n📊 TARGETS:\n• Distance: 38–50 km\n• Speed: 20–25 km/h average\n• Heart Rate: 130–150 bpm average (Zone 2–3)\n\n🗺️ STRUCTURE:\n• 0–10 min: Easy warm-up spin\n• 10–70 min: Steady effort, tackle any hills at controlled pace (Zone 3–4)\n• 70–80 min: Cool-down, reduce pace\n\n🎒 BRING:\n• 1–1.5L water (drink every 15 min, don't wait to feel thirsty)\n• 1–2 bananas or energy bars/gels (eat at 30 min and 60 min marks)\n• Sunscreen, phone, ID\n\n💡 On climbs: drop to an easy gear and keep cadence high — don't grind. Stand up briefly if needed.`,
+  ],
+
+  // ── PHASE 3: Momentum (Months 7–12) ───────────────────
+  [
+    // Sunday — Yoga
+    `🕐 90 min · Power Yoga or Intermediate Vinyasa\n\n🧘 SEQUENCE:\n• Sun Salutation A × 5 + B × 5 (vigorous warm-up)\n• Warrior II → Extended Side Angle → Triangle — 60s each, both sides\n• Chair Pose × 3 × 45s (thighs burn = working)\n• Crow Pose attempt (arm balance) — 5 min practice\n• Pigeon Pose — 4 min each side\n• Boat Pose: 3 × 30s\n• Wheel Pose / Supported Bridge: 3 × 20s\n• Shoulderstand or Headstand (wall-supported) — 2 min\n• Supine Twist — 2 min each side\n• Savasana — 7 min\n• Pranayama: Alternate nostril breathing — 5 min\n\n🎯 By this phase yoga should feel like a real workout, not just stretching`,
+
+    // Monday — Upper Body Heavy
+    `🕐 60 min · Upper Body — Heavy Compound Focus\n\n🔥 WARM-UP (7 min): rotator cuff work, band pull-aparts, light sets\n\n💪 WORKOUT:\n• Barbell/Dumbbell Bench Press: 4 × 6–8 @ 65–75% of max effort\n• Barbell or Dumbbell Row: 4 × 6–8 @ 20–28 kg\n• Overhead Press (barbell or dumbbells): 4 × 8 @ 14–18 kg\n• Pull-Ups or Assisted Pull-Ups: 3 × 8 (use resistance band assistance if needed)\n• Lateral Raises: 4 × 12 @ 7–10 kg (strict — no body swing)\n• Tricep Pushdown (cable) or Dips: 3 × 12\n• Rear Delt Fly: 3 × 15 @ 6–8 kg\n\n📈 REST: 2 min between heavy sets, 60s between accessory\n\n💡 Track your weights each session. If you can complete all reps easily, add 2 kg next week.`,
+
+    // Tuesday — Tempo Cycling
+    `🕐 45 min · Tempo Ride · 25–32 km\n\n🚴 ROUTE: Moderately rolling terrain or flat with one long steady climb.\n\n📊 STRUCTURE:\n• 0–10 min: Easy warm-up spin @ Zone 2\n• 10–30 min: SUSTAINED TEMPO EFFORT @ Zone 3–4:\n  — Heart Rate: 145–165 bpm\n  — Speed: 24–28 km/h on flat\n  — Effort: You can say a word or two but NOT hold a conversation\n• 30–40 min: Reduce to Zone 2\n• 40–45 min: Easy cool-down\n\n🎯 Total Distance: 25–32 km\n\n💡 Tempo training is the single most effective way to build cycling fitness. It's uncomfortable — that's the point. Stick with it.`,
+
+    // Wednesday — Lower Body Heavy
+    `🕐 60 min · Lower Body — Heavy Compound Focus\n\n🔥 WARM-UP (7 min): leg swings, hip circles, goblet squat × 10 @ light weight\n\n🦵 WORKOUT:\n• Barbell Back Squat: 4 × 5 @ 25–40 kg (heavy, controlled descent)\n• Barbell Deadlift: 3 × 5 @ 30–45 kg (form is everything — hinge, don't round)\n• Bulgarian Split Squat: 3 × 10 each leg @ 10–14 kg dumbbells (hardest leg exercise)\n• Barbell/Dumbbell Hip Thrust: 3 × 12 @ 20–30 kg across hips\n• Lying Leg Curl (machine): 3 × 12 @ moderate weight\n• Standing Calf Raises: 4 × 20 (3s eccentric)\n• Plank: 3 × 45 seconds\n\n📈 REST: 2–3 min between heavy sets\n\n⚠️ Deadlift form check: watch your back in a mirror or phone. ANY rounding = reduce weight immediately`,
+
+    // Thursday — Yoga + Core
+    `🕐 45 min · Midweek Yoga Flow + Core\n\n🧘 YOGA FLOW (30 min):\n• Cat-Cow → Thread the Needle (thoracic rotation) × 10 each\n• Low Lunge with twist × 60s each side\n• Half Pigeon → Full Pigeon × 3 min each side\n• Downward Dog → Three-Legged Dog × 5 each side\n• Standing Forward Fold with shoulder opener × 2 min\n• Supine figure-4 stretch (IT band/glute) × 2 min each\n\n🔥 CORE CIRCUIT (15 min, 3 rounds):\n• Plank: 45 seconds\n• Hollow Body Hold: 30 seconds\n• Side Plank: 35s each side\n• Bicycle Crunches: 25 each side\n• Dead Bug: 12 each side\n\n💡 This midweek session is your secret weapon for injury prevention`,
+
+    // Friday — Hypertrophy
+    `🕐 60 min · Full Body — Hypertrophy (Muscle Building Focus)\n\n🔥 WARM-UP (5 min)\n\n🏋️ WORKOUT (3 sets × 12 reps, 60s rest, SLOW tempo 3-1-1):\n• Squat variation (goblet/barbell): 3 × 12 @ moderate weight, 3s down\n• Dumbbell Incline Press: 3 × 12 @ 12–16 kg each\n• Seated Cable Row or Dumbbell Row: 3 × 12 @ 14–18 kg\n• Romanian Deadlift: 3 × 12 @ 20–25 kg\n• Arnold Press: 3 × 12 @ 10–12 kg\n• Hammer Curls: 3 × 12 @ 10–12 kg each\n• Tricep Overhead Extension: 3 × 12 @ 14–16 kg\n• Plank to Down Dog: 3 × 10\n\n💡 Hypertrophy = time under tension. Slow down the lowering phase. Feel the muscle working. This builds the lean mass that reshapes your body.`,
+
+    // Saturday — Long Hilly Ride
+    `🕐 90–105 min · Long Hilly Ride · 50–65 km\n\n🚴 ROUTE: 2–3 proper climbs of 2–4 km each. This is your main fitness session.\n\n📊 TARGETS:\n• Distance: 50–65 km\n• Average Speed: 22–26 km/h\n• Elevation: 400–700m total climbing\n• Heart Rate: 130–160 bpm (varies by terrain)\n\n🗺️ STRUCTURE:\n• 0–10 min: Easy warm-up\n• 10–80 min: Ride — climb at Zone 3–4, recover on descents\n• 80–90 min: Cool-down spin\n\n🎒 BRING:\n• 1.5–2L water total (bottles on bike)\n• 2–3 energy bars or bananas + 1 gel for tough climbs\n• Sunscreen, ID, basic repair kit (tyre lever, tube, mini pump)\n• Tell someone your route and ETA\n\n💡 On climbs: breathe rhythmically, keep cadence above 70 rpm, don't accelerate past Zone 4`,
+  ],
+
+  // ── PHASE 4: Peak (Months 13–15) ──────────────────────
+  [
+    // Sunday — Restorative Yoga
+    `🕐 90 min · Advanced Vinyasa + Yin Combination\n\n🧘 SEQUENCE:\n• Sun Salutation A × 6 + B × 4 (vigorous)\n• Standing Sequence: Warrior I/II/III, Half Moon, Revolved Triangle\n• Arm Balance Practice: Crow or Side Crow — 10 min\n• Pigeon — 5 min each side (deep tissue work)\n• Full Forward Fold sequence — 5 min\n• Yin Section: Hold each pose 4–5 min:\n  — Sleeping Swan (pigeon variation)\n  — Dragon (deep hip flexor)\n  — Caterpillar (hamstrings)\n• Savasana — 10 min with body scan meditation\n• Pranayama: Kapalabhati (breath of fire) — 3 min\n\n🎯 By Phase 4 you should feel a genuine difference in flexibility and body awareness`,
+
+    // Monday — Upper Body Maintain
+    `🕐 60 min · Upper Body — Strength Maintenance with Tempo Work\n\n🔥 WARM-UP (7 min)\n\n💪 WORKOUT (4 sets, 2 min rest between heavy sets):\n• Barbell Bench Press: 4 × 8 @ 70–80% max — TEMPO: 3s down, 1s pause, 1s up\n• Pendlay Row: 4 × 8 @ 25–35 kg — TEMPO: controlled\n• Overhead Press: 4 × 8 @ 16–22 kg\n• Weighted Pull-Ups or Pull-Ups: 3 × 8\n• Cable Lateral Raise: 4 × 12 @ 6–8 kg\n• Tricep Dips: 3 × 12 (weighted if bodyweight is easy)\n• Face Pull: 3 × 20 @ light weight (shoulder health)\n\n💡 Tempo work (3-1-1) at this phase maximises muscle fibre recruitment without adding more volume. Quality over quantity.`,
+
+    // Tuesday — Fartlek Cycling
+    `🕐 50 min · Fartlek Cycling · 35–42 km\n\n🚴 WHAT IS FARTLEK? Swedish for "speed play" — you vary your effort based on feel, landmarks, or mood. No rigid intervals. Very effective and enjoyable.\n\n📊 HOW TO DO IT:\n• Warm up 10 min easy\n• Then for 35 min: vary effort freely:\n  — Sprint to that lamppost\n  — Hold fast pace to the next junction\n  — Recover for 3 min\n  — Push hard up a small rise\n  — Cruise for 5 min\n• Cool down 5 min\n\n🎯 Distance: 35–42 km\n🎯 You should hit Zone 2, 3, 4 at various points\n\n💡 This session simulates real-world cycling conditions and is excellent for fat oxidation across multiple heart rate zones`,
+
+    // Wednesday — Lower Body Maintain
+    `🕐 60 min · Lower Body — Strength Maintenance\n\n🔥 WARM-UP (7 min)\n\n🦵 WORKOUT:\n• Back Squat: 4 × 6 @ 75–85% max — heavy, focused\n• Deadlift: 3 × 5 @ 80% max — your strongest lift of the week\n• Bulgarian Split Squat: 3 × 10 each leg @ 14–18 kg\n• Cable Pull-Through or Kettlebell Swing: 3 × 15 @ 16–20 kg\n• Leg Extension (machine): 3 × 15 @ moderate\n• Nordic Hamstring Curl or Leg Curl: 3 × 10\n• Standing Calf Raises: 4 × 20 (weighted)\n• Plank: 3 × 60 seconds\n\n💡 At Peak phase your squat and deadlift numbers should be significantly higher than Month 1. Track them — you've earned those numbers.`,
+
+    // Thursday — Yin Yoga
+    `🕐 45 min · Yin Yoga — Deep Tissue Recovery\n\n🧘 YIN POSES (hold each 4–5 min, use props/cushions):\n• Butterfly / Bound Angle — inner groin\n• Sleeping Swan Left — deep hip/piriformis\n• Sleeping Swan Right\n• Dragon Low Lunge Left — hip flexors (critical for cyclists)\n• Dragon Low Lunge Right\n• Caterpillar — full back body, hamstrings\n• Supported Fish — chest opener, thoracic extension\n• Savasana — 5 min\n\n💡 Yin is NOT restorative — you should feel a deep, intense stretch. Breathe through it. This targets the connective tissue (fascia, ligaments) that regular stretching doesn't reach.\n\n🎯 By Phase 4 your flexibility should be noticeably better than Month 1`,
+
+    // Friday — Peak Circuit
+    `🕐 50 min · Full Body Circuit — Peak Conditioning\n\n🔥 WARM-UP (5 min)\n\n🏋️ CIRCUIT (4 rounds, 40s work / 20s rest, 90s between rounds):\n• Round 1–4:\n  1. Kettlebell Swings @ 16–20 kg\n  2. Push-Up Variations (standard → diamond → archer)\n  3. Dumbbell Goblet Squat @ 20–24 kg\n  4. TRX Row or Inverted Row\n  5. Box Jump or Step-Up Jump @ knee height\n\n📈 Track your round times. You should complete rounds 1–4 with similar energy.\n\n💡 This AMRAP-style session keeps your metabolic rate elevated for hours. Combined with the fasted morning condition (if applicable), excellent for final body composition push.`,
+
+    // Saturday — Endurance Ride
+    `🕐 100–120 min · Peak Endurance Ride · 65–80 km\n\n🚴 ROUTE: Significant terrain — 3–4 climbs of 3–5 km each, 600–900m total elevation.\n\n📊 TARGETS:\n• Distance: 65–80 km\n• Average Speed: 23–27 km/h\n• Elevation: 600–900m\n• Heart Rate: Varied — Zone 2 on flats, Zone 3–4 on climbs\n\n🗺️ STRUCTURE:\n• 0–15 min: Warm-up, easy spin\n• 15–95 min: Ride — pace yourself, don't blow up on first climb\n• 95–110 min: Cool-down spin\n\n🎒 FULL NUTRITION PLAN:\n• Pre-ride: Oats + banana 90 min before\n• On bike: 2 × 750ml bottles, 3 energy bars, 2 gels for climbs\n• Eat every 30–40 min regardless of hunger\n• Post-ride: Protein shake within 30 min, proper meal within 90 min\n\n🏆 THIS RIDE REPRESENTS HOW FAR YOU'VE COME. Month 1 you cycled 30 km flat. Today you're doing 80 km with mountains. Celebrate that.`,
+  ],
+];
+
+const PHASES = [
+  { id:1, name:"Foundation", range:"Months 1–3",   col:"#4ade80" },
+  { id:2, name:"Build",      range:"Months 4–6",   col:"#facc15" },
+  { id:3, name:"Momentum",   range:"Months 7–12",  col:"#60a5fa" },
+  { id:4, name:"Peak",       range:"Months 13–15", col:"#f97316" },
+];
+const TCOLS = { strength:"#facc15", cycling:"#4ade80", yoga:"#c084fc", recovery:"#94a3b8" };
+const BASE = { weight:90, bf:34, vf:17 };
+const TARG = { weight:80, bf:25, vf:12 };
+const GFIT_SCOPE = "https://www.googleapis.com/auth/fitness.body.read https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/calendar.events";
+const FITBIT_SCOPE = "heartrate";
+
+const PHASE_CAL = [
+  { strength:{dur:45,note:"Light weights, form focus. 3×12 reps. Rest 90s. See FitTrack for full exercise list."},cycling_tue:{dur:30,note:"Easy Zone 2, 15–18 km flat. Hold full conversation throughout."},cycling_sat:{dur:65,note:"Steady 30–38 km, flat terrain. Zone 2–3. Bring 750ml water + banana."},yoga:{dur:60,note:"Beginner Hatha/Yin. Pigeon, downward dog, spinal twist. See FitTrack for sequence."},recovery:{dur:30,note:"Brisk walk 3–4 km or easy cycling 10–12 km. Under 110 bpm. No effort."} },
+  { strength:{dur:55,note:"Progressive overload, 4×10 reps. See FitTrack for full exercise list with weights."},cycling_tue:{dur:35,note:"6× intervals: 2 min hard Zone 4 / 2 min easy Zone 2. 20–25 km total."},cycling_sat:{dur:80,note:"38–50 km, gentle hills. Zone 2–3. 1L water + 2 snacks."},yoga:{dur:75,note:"Intermediate Vinyasa. Sun salutations, warriors, pigeon. See FitTrack."},recovery:{dur:45,note:"Walk/cycle + 3-round core circuit: plank, bicycle crunches, Russian twists, dead bug."} },
+  { strength:{dur:60,note:"Heavy compounds 4×6–8. Track weights. See FitTrack for full exercise list."},cycling_tue:{dur:45,note:"20 min sustained tempo Zone 3–4. 25–32 km total. Uncomfortable is the point."},cycling_sat:{dur:95,note:"50–65 km, 2–3 climbs. 400–700m elevation. 1.5L water + 3 snacks."},yoga:{dur:90,note:"Power yoga/advanced Vinyasa + arm balances. See FitTrack for full sequence."},recovery:{dur:45,note:"30 min yoga flow + 15 min core circuit (plank 45s, hollow hold, side plank)."} },
+  { strength:{dur:60,note:"Maintain with 3-1-1 tempo, 4×8. See FitTrack for full exercise list."},cycling_tue:{dur:50,note:"Fartlek 35–42 km — vary effort freely. Sprint to landmarks, recover, repeat."},cycling_sat:{dur:110,note:"65–80 km, 600–900m elevation. Full nutrition plan. See FitTrack. Your proudest ride."},yoga:{dur:90,note:"Advanced Vinyasa + Yin. Hold poses 4–5 min. Celebrate how far you've come."},recovery:{dur:45,note:"Yin yoga 45 min — hold each pose 4–5 min. Deep tissue work."} },
+];
+let state = {
+  checkins: {}, measures: [], startDate: dk(),
+  gymTime: "12:00",
+  // Google Fit
+  gfitToken: null, gfitExpiry: 0, clientId: "",
+  gfitWeight: null, gfitSteps: null, gfitCals: null,
+  // Fitbit
+  fitbitClientId: "", fitbitToken: null, fitbitRefresh: null, fitbitExpiry: 0,
+  fitbitRHR: null, fitbitHRV: null, fitbitHRVDeep: null,
+};
+
+function dk(d=new Date()){ return d.toISOString().slice(0,10); }
+function save(){ try{ localStorage.setItem("ft2025",JSON.stringify(state)); }catch(_){} }
+function load(){
+  try{
+    const s=localStorage.getItem("ft2025");
+    if(s){ const p=JSON.parse(s); Object.assign(state,p); }
+  }catch(_){}
+}
+
+// ── Nav ────────────────────────────────────────────────
+function navTo(id, btn){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  if(btn) btn.classList.add("active");
+  if(id==="today")   renderToday();
+  if(id==="log")     renderLog();
+  if(id==="stats")   renderStats();
+  if(id==="history") renderHistory();
+  if(id==="setup")   renderSetup();
+}
+
+// ── Toast ──────────────────────────────────────────────
+let toastTimer;
+function toast(msg, dur=2500){
+  const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"), dur);
+}
+
+// ── Phase ──────────────────────────────────────────────
+function getPhase(){
+  const m=(Date.now()-new Date(state.startDate))/(1000*60*60*24*30.44);
+  return m<3?0:m<6?1:m<12?2:3;
+}
+
+// ── Check-in ───────────────────────────────────────────
+function toggleCheckin(){
+  const k=dk(); state.checkins[k]=!state.checkins[k]; save(); renderToday();
+  if(state.checkins[k]) toast("✅ Session logged! Great work!");
+}
+
+// ── Measures ───────────────────────────────────────────
+function saveMeasure(){
+  const w=document.getElementById("logWeight").value;
+  const b=document.getElementById("logBF").value;
+  const v=document.getElementById("logVF").value;
+  const weight = (state.gfitWeight && !w) ? state.gfitWeight : (w ? +w : null);
+  const rhr = state.fitbitRHR || null;
+  const hrv = state.fitbitHRV || null;
+  if(!weight && !b && !v){ toast("⚠️ Enter at least one value"); return; }
+  const entry={date:dk(),weight,bf:b?+b:null,vf:v?+v:null,rhr,hrv};
+  state.measures=[entry,...state.measures].slice(0,200); save();
+  document.getElementById("logWeight").value="";
+  document.getElementById("logBF").value="";
+  document.getElementById("logVF").value="";
+  document.getElementById("save-btn").textContent="✅ Saved!";
+  setTimeout(()=>document.getElementById("save-btn").textContent="Save Measurement",2000);
+  toast("📋 Measurement saved");
+  renderLog();
+}
+
+function saveStartDate(v){ state.startDate=v; save(); renderToday(); renderHistory(); }
+
+// ── Stats helpers ──────────────────────────────────────
+function streak(){
+  const today=dk(); let s=0,d=new Date();
+  for(let i=0;i<365;i++){
+    const k=dk(d);
+    if(i===0&&!state.checkins[k]){ d.setDate(d.getDate()-1); continue; }
+    if(state.checkins[k]){ s++; d.setDate(d.getDate()-1); }
+    else if(i>0) break;
+    else d.setDate(d.getDate()-1);
+  }
+  return s;
+}
+function comp30(){
+  let done=0,tot=0;
+  for(let i=0;i<30;i++){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const k=dk(d);
+    if(k>=state.startDate){ tot++; if(state.checkins[k]) done++; }
+  }
+  return tot?Math.round((done/tot)*100):0;
+}
+function pct(cur,base,tgt){ return Math.min(100,Math.max(0,Math.round(((base-cur)/(base-tgt))*100))); }
+function latest(field){ const m=state.measures.find(x=>x[field]!=null); return m?m[field]:null; }
+function curWeight(){ return state.gfitWeight||latest("weight")||BASE.weight; }
+
+// ── Render Today ───────────────────────────────────────
+function renderToday(){
+  const now=new Date(), dow=now.getDay(), plan=PLAN[dow], k=dk(), done=!!state.checkins[k];
+  const pi=getPhase(), ph=PHASES[pi];
+
+  document.getElementById("today-eyebrow").textContent=
+    now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+  document.getElementById("today-greeting").innerHTML=
+    `Good ${now.getHours()<12?"Morning":now.getHours()<17?"Afternoon":"Evening"} 👋`;
+
+  const chip=document.getElementById("phase-chip");
+  chip.innerHTML=`<span class="chip" style="color:${ph.col};border-color:${ph.col}44;background:${ph.col}0d">
+    <span style="width:5px;height:5px;border-radius:50%;background:${ph.col};box-shadow:0 0 6px ${ph.col}"></span>
+    Phase ${pi+1}: ${ph.name} · ${ph.range}
+  </span>`;
+
+  const wc=document.getElementById("workout-card");
+  wc.style.background=`linear-gradient(135deg,${plan.col}0c 0%,rgba(255,255,255,.012) 100%)`;
+  wc.style.borderColor=`${plan.col}25`;
+  document.getElementById("wc-bg-icon").textContent=plan.icon;
+  document.getElementById("wc-eyebrow").textContent="Today's Session";
+  document.getElementById("wc-eyebrow").style.color=plan.col;
+  document.getElementById("wc-title").textContent=`${plan.icon} ${plan.label}`;
+  const detail = PHASE_DETAIL[pi][dow];
+  document.getElementById("wc-detail").style.whiteSpace="pre-line";
+  document.getElementById("wc-detail").textContent=detail;
+
+  const btn=document.getElementById("checkin-btn");
+  if(done){
+    btn.className="btn btn-done pop"; btn.textContent="✅ Session Complete!";
+  } else {
+    btn.className="btn btn-green btn-pulse";
+    btn.style.background=plan.col; btn.style.borderColor=plan.col; btn.style.color="#050a05";
+    btn.textContent="✓ Mark as Done";
+  }
+
+  document.getElementById("s-streak").textContent=streak()+"d";
+  document.getElementById("s-comp").textContent=comp30()+"%";
+  document.getElementById("s-weight").textContent=curWeight()+"kg";
+
+  // Week strip
+  const strip=document.getElementById("week-strip"); strip.innerHTML="";
+  PLAN.forEach(d=>{
+    const day=new Date(now); day.setDate(now.getDate()-dow+d.day);
+    const kk=dk(day), dd=!!state.checkins[kk], isT=d.day===dow, fut=d.day>dow;
+    const tc=TCOLS[d.type];
+    const el=document.createElement("div");
+    el.className="week-day";
+    el.style.cssText=isT?`background:${tc}16;border-color:${tc}40`:"";
+    el.innerHTML=`<div class="wd-icon" style="opacity:${fut?.25:dd?1:.5}">${dd?"✅":d.icon}</div>
+      <div class="wd-lbl" style="color:${isT?tc:"var(--text4)"}">${d.name.slice(0,2).toUpperCase()}</div>`;
+    strip.appendChild(el);
+  });
+
+  // GFit status
+  renderGfitStatus();
+}
+
+function renderGfitStatus(){
+  const el=document.getElementById("gfit-status");
+  const gd=document.getElementById("gfit-data");
+  if(state.clientId && state.gfitToken && Date.now()<state.gfitExpiry){
+    el.innerHTML=`<div class="gfit-badge connected">
+      <span>✅</span><span>Google Fit connected</span>
+      <button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="syncGfit()">↻ Sync</button>
+    </div>`;
+    if(state.gfitWeight||state.gfitSteps){
+      gd.style.display="block";
+      if(state.gfitWeight) document.getElementById("gf-weight").textContent=`⚖️ ${state.gfitWeight} kg`;
+      if(state.gfitSteps) document.getElementById("gf-steps").textContent=`👟 ${state.gfitSteps.toLocaleString()} steps today`;
+      if(state.gfitCals) document.getElementById("gf-calories").textContent=`🔥 ${state.gfitCals} kcal today`;
+    }
+  } else if(state.clientId){
+    el.innerHTML=`<div class="gfit-badge disconnected">
+      <span>⚪</span><span>Session expired</span>
+      <button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="authGfit()">Reconnect</button>
+    </div>`;
+  } else {
+    el.innerHTML=`<div class="gfit-badge disconnected">
+      <span>⚪</span><span>Not connected</span>
+      <button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="openGfitModal()">Connect</button>
+    </div>`;
+  }
+  renderFitbitStatus();
+}
+
+function renderFitbitStatus(){
+  const el=document.getElementById("fitbit-status");
+  const fd=document.getElementById("fitbit-data");
+  const connected = state.fitbitToken && Date.now()<state.fitbitExpiry;
+  const hasRefresh = !!state.fitbitRefresh;
+  if(connected){
+    el.innerHTML=`<div class="gfit-badge connected">
+      <span>✅</span><span>Fitbit connected</span>
+      <button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="syncFitbit()">↻ Sync</button>
+    </div>`;
+    if(state.fitbitRHR||state.fitbitHRV){
+      fd.style.display="block";
+      if(state.fitbitRHR) document.getElementById("fb-rhr").textContent=state.fitbitRHR;
+      if(state.fitbitHRV) document.getElementById("fb-hrv").textContent=state.fitbitHRV;
+    }
+  } else if(state.fitbitClientId && hasRefresh){
+    el.innerHTML=`<div class="gfit-badge disconnected">
+      <span>🔄</span><span>Session expired</span>
+      <button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="refreshFitbitToken()">Refresh</button>
+    </div>`;
+  } else if(state.fitbitClientId){
+    el.innerHTML=`<div class="gfit-badge disconnected">
+      <span>⚪</span><span>Not authorised</span>
+      <button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="authFitbit()">Authorise</button>
+    </div>`;
+  } else {
+    el.innerHTML=`<div class="gfit-badge disconnected">
+      <span>⚪</span><span>Not connected</span>
+      <button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="openFitbitModal()">Connect</button>
+    </div>`;
+  }
+}
+
+// ── Render Log ─────────────────────────────────────────
+function renderLog(){
+  document.getElementById("log-date-label").textContent=dk();
+  const hasGfit = state.gfitToken && Date.now()<state.gfitExpiry && state.gfitWeight;
+  document.getElementById("gfit-weight-section").style.display=hasGfit?"block":"none";
+  document.getElementById("manual-weight-section").style.display=hasGfit?"none":"block";
+  if(hasGfit) document.getElementById("gfit-weight-display").textContent=`${state.gfitWeight} kg (auto-synced)`;
+
+  const hasFitbit = state.fitbitToken && Date.now()<state.fitbitExpiry;
+  document.getElementById("fitbit-rhr-section").style.display=(hasFitbit&&state.fitbitRHR)?"block":"none";
+  document.getElementById("fitbit-hrv-section").style.display=(hasFitbit&&state.fitbitHRV)?"block":"none";
+  if(hasFitbit&&state.fitbitRHR) document.getElementById("fitbit-rhr-display").textContent=`${state.fitbitRHR} bpm (auto-synced)`;
+  if(hasFitbit&&state.fitbitHRV) document.getElementById("fitbit-hrv-display").textContent=`${state.fitbitHRV} ms daily RMSSD (auto-synced)`;
+
+  const re=document.getElementById("recent-entries");
+  if(!state.measures.length){ re.innerHTML=""; return; }
+  let html=`<div class="card-label" style="padding:0 0 .5rem">Recent Entries</div>`;
+  state.measures.slice(0,15).forEach(m=>{
+    html+=`<div style="display:flex;gap:.5rem;padding:.65rem 0;border-bottom:1px solid var(--border2);align-items:center;flex-wrap:wrap">
+      <span style="font-size:.68rem;color:var(--text3);font-family:var(--font-mono);min-width:85px">${m.date}</span>
+      ${m.weight!=null?`<span style="font-size:.82rem;color:var(--green);font-family:var(--font-sans)">⚖️ ${m.weight}kg</span>`:""}
+      ${m.bf!=null?`<span style="font-size:.82rem;color:var(--yellow);font-family:var(--font-sans)">🔥 ${m.bf}%</span>`:""}
+      ${m.vf!=null?`<span style="font-size:.82rem;color:var(--orange);font-family:var(--font-sans)">🫀 VF${m.vf}</span>`:""}
+      ${m.rhr!=null?`<span style="font-size:.82rem;color:var(--red);font-family:var(--font-sans)">❤️ ${m.rhr}bpm</span>`:""}
+      ${m.hrv!=null?`<span style="font-size:.82rem;color:var(--purple);font-family:var(--font-sans)">🫀 HRV${m.hrv}ms</span>`:""}
+    </div>`;
+  });
+  re.innerHTML=html;
+}
+
+// ── Render Stats ───────────────────────────────────────
+function renderStats(){
+  const cw=curWeight(), cb=latest("bf")??BASE.bf, cv=latest("vf")??BASE.vf;
+  const pi=getPhase(), ph=PHASES[pi];
+
+  // Goal bars
+  let gb="";
+  [{label:"Weight",cur:cw,base:BASE.weight,tgt:TARG.weight,unit:"kg",col:"#4ade80"},
+   {label:"Body Fat",cur:cb,base:BASE.bf,tgt:TARG.bf,unit:"%",col:"#facc15"},
+   {label:"Visceral Fat",cur:cv,base:BASE.vf,tgt:TARG.vf,unit:"",col:"#f97316"},
+  ].forEach(g=>{
+    const p=pct(g.cur,g.base,g.tgt);
+    gb+=`<div style="margin-bottom:1rem">
+      <div style="display:flex;justify-content:space-between;margin-bottom:.3rem">
+        <span style="font-size:.8rem;color:var(--text2);font-family:var(--font-sans)">${g.label}</span>
+        <span style="font-size:.75rem;font-family:var(--font-mono);color:${g.col}">${g.cur}${g.unit} → ${g.tgt}${g.unit}</span>
+      </div>
+      <div class="prog-wrap"><div class="prog-bar" style="width:${p}%;background:linear-gradient(90deg,${g.col}60,${g.col})"></div></div>
+      <div style="font-size:.6rem;color:var(--text3);font-family:var(--font-mono);text-align:right;margin-top:.2rem">${p}% complete</div>
+    </div>`;
+  });
+  document.getElementById("goal-bars").innerHTML=gb;
+
+  // 4-stat grid
+  const sg=document.getElementById("stats-grid2");
+  const totalLogged=Object.values(state.checkins).filter(Boolean).length;
+  sg.innerHTML=[
+    {label:"Streak",    val:streak()+"d",            icon:"🔥", col:"#f97316", sub:"consecutive"},
+    {label:"30-Day",    val:comp30()+"%",             icon:"📈", col:"#60a5fa", sub:"completion"},
+    {label:"Phase",     val:`${pi+1} of 4`,           icon:"🎯", col:ph.col,    sub:ph.name},
+    {label:"Workouts",  val:totalLogged,              icon:"✅", col:"#c084fc", sub:"all time"},
+  ].map(s=>`<div class="stat-box">
+    <div style="font-size:1.25rem;margin-bottom:.25rem">${s.icon}</div>
+    <div class="stat-val" style="color:${s.col}">${s.val}</div>
+    <div class="stat-lbl">${s.label}</div>
+    <div style="font-size:.68rem;color:var(--text4);font-family:var(--font-sans);margin-top:.1rem">${s.sub}</div>
+  </div>`).join("");
+
+  // Charts
+  const cs=document.getElementById("charts-section");
+  cs.innerHTML="";
+  [{field:"weight",label:"Weight Trend",col:"#4ade80",tgt:TARG.weight,unit:"kg"},
+   {field:"bf",    label:"Body Fat Trend",col:"#facc15",tgt:TARG.bf,  unit:"%"},
+   {field:"vf",    label:"Visceral Fat",col:"#f97316",  tgt:TARG.vf,  unit:""},
+   {field:"rhr",   label:"Resting Heart Rate",col:"#f87171",tgt:55,    unit:" bpm"},
+   {field:"hrv",   label:"HRV — RMSSD (higher = better)",col:"#c084fc",tgt:45,unit:" ms"},
+  ].forEach(c=>{
+    const div=document.createElement("div");
+    div.className="card"; div.style.marginBottom=".7rem";
+    div.innerHTML=`<div class="card-label" style="color:${c.col}">${c.label}</div>
+      <div class="chart-wrap">${makeSVGChart(c.field,c.col,c.tgt,c.unit)}</div>`;
+    cs.appendChild(div);
+  });
+}
+
+function makeSVGChart(field,col,tgt,unit){
+  const pts=state.measures.filter(m=>m[field]!=null).slice(0,20).reverse();
+  if(pts.length<2) return `<div style="text-align:center;color:var(--text4);font-size:.75rem;padding:1.5rem 0;font-family:var(--font-sans)">Log 2+ measurements to see chart</div>`;
+  const W=320,H=72;
+  const vals=pts.map(p=>p[field]);
+  const lo=Math.min(...vals,tgt)-1.5, hi=Math.max(...vals)+1.5;
+  const x=i=>(i/(pts.length-1))*W, y=v=>H-((v-lo)/(hi-lo))*H;
+  const path=pts.map((p,i)=>`${i?"L":"M"}${x(i)} ${y(p[field])}`).join(" ");
+  const ty=y(tgt);
+  const dots=pts.map((p,i)=>`<circle cx="${x(i)}" cy="${y(p[field])}" r="3.5" fill="${col}" stroke="#080d08" stroke-width="1.5"/>`).join("");
+  return `<svg width="100%" viewBox="0 0 ${W} ${H+24}" style="overflow:visible;display:block">
+    <line x1="0" y1="${ty}" x2="${W}" y2="${ty}" stroke="${col}" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
+    <text x="${W-2}" y="${ty-5}" fill="${col}" font-size="9" text-anchor="end" opacity="0.5">target ${tgt}${unit}</text>
+    <path d="${path}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}
+    <text x="0" y="${H+20}" fill="#374737" font-size="9">${pts[0].date.slice(5)}</text>
+    <text x="${W}" y="${H+20}" fill="#374737" font-size="9" text-anchor="end">${pts[pts.length-1].date.slice(5)}</text>
+  </svg>`;
+}
+
+// ── Render History ─────────────────────────────────────
+function renderHistory(){
+  document.getElementById("startDateInput").value=state.startDate;
+  const now=new Date(), today=dk(), dow=now.getDay();
+  const grid=document.getElementById("hist-grid"); grid.innerHTML="";
+  for(let i=0;i<42;i++){
+    const d=new Date(now); d.setDate(now.getDate()-41+i);
+    const k=dk(d), done=!!state.checkins[k], isT=k===today, fut=d>now;
+    const tc=TCOLS[PLAN[d.getDay()].type];
+    const el=document.createElement("div");
+    el.className="hist-day"+(isT?" today":"")+(fut?" future":"")+(done?" done":"");
+    el.style.cssText=done?`background:${tc}22;border-color:${tc}40;color:${tc}`:"";
+    el.textContent=done?"✓":d.getDate();
+    if(!fut) el.onclick=()=>{ state.checkins[k]=!state.checkins[k]; save(); renderHistory(); renderToday(); };
+    grid.appendChild(el);
+  }
+  // Legend
+  const lg=document.getElementById("hist-legend"); lg.innerHTML="";
+  Object.entries({strength:"Strength",cycling:"Cycling",yoga:"Yoga",recovery:"Recovery"}).forEach(([k,v])=>{
+    const s=document.createElement("div");
+    s.style.cssText="display:flex;align-items:center;gap:.3rem;font-size:.62rem;font-family:var(--font-sans);color:var(--text3)";
+    s.innerHTML=`<span style="width:10px;height:10px;border-radius:3px;background:${TCOLS[k]}30;border:1px solid ${TCOLS[k]}55;display:inline-block"></span>${v}`;
+    lg.appendChild(s);
+  });
+  // All time
+  let missed=0;
+  for(let i=1;i<180;i++){
+    const d=new Date(now); d.setDate(now.getDate()-i);
+    const k=dk(d); if(k>=state.startDate&&!state.checkins[k]) missed++;
+  }
+  document.getElementById("alltime-stats").innerHTML=[
+    {label:"Logged",  val:Object.values(state.checkins).filter(Boolean).length},
+    {label:"Missed",  val:missed},
+    {label:"Measures",val:state.measures.length},
+  ].map(s=>`<div><div style="font-size:1.25rem;color:var(--green);font-weight:700;font-family:var(--font-sans)">${s.val}</div>
+    <div style="font-size:.6rem;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em">${s.label}</div>
+  </div>`).join("");
+}
+
+// ── Google Fit ─────────────────────────────────────────
+function openGfitModal(){ document.getElementById("gfitModal").classList.add("open"); }
+function closeGfitModal(){ document.getElementById("gfitModal").classList.remove("open"); }
+function saveClientId(){
+  const v=document.getElementById("clientIdInput").value.trim();
+  if(!v){ toast("⚠️ Please paste your Client ID"); return; }
+  state.clientId=v; save(); closeGfitModal(); authGfit();
+}
+
+let tokenClient;
+function loadGsi(){
+  return new Promise(res=>{
+    if(window.google){ res(); return; }
+    const s=document.createElement("script");
+    s.src="https://accounts.google.com/gsi/client"; s.onload=res; document.head.appendChild(s);
+  });
+}
+
+async function authGfit(){
+  if(!state.clientId){ openGfitModal(); return; }
+  await loadGsi();
+  tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id: state.clientId,
+    scope: GFIT_SCOPE,
+    callback: async(resp)=>{
+      if(resp.error){ toast("❌ Auth error: "+resp.error); return; }
+      state.gfitToken=resp.access_token;
+      state.gfitExpiry=Date.now()+(resp.expires_in||3600)*1000;
+      save(); await syncGfit(); renderToday(); toast("✅ Google Fit connected!");
+    }
+  });
+  tokenClient.requestAccessToken();
+}
+
+async function syncGfit(){
+  if(!state.gfitToken||Date.now()>=state.gfitExpiry){ authGfit(); return; }
+  toast("🔄 Syncing Google Fit…");
+  try {
+    // Weight — last 30 days
+    const wRes=await gfitReq("https://www.googleapis.com/fitness/v1/users/me/dataSources/derived:com.google.weight:com.google.android.gms:merge_weight/datasets/"+(Date.now()-30*86400000)+"000000-"+Date.now()+"000000");
+    const wPts=wRes?.point;
+    if(wPts?.length){ state.gfitWeight=+(wPts[wPts.length-1].value[0].fpVal.toFixed(1)); }
+
+    // Steps today
+    const midnight=new Date(); midnight.setHours(0,0,0,0);
+    const sRes=await gfitAggregate([{dataTypeName:"com.google.step_count.delta"}], midnight.getTime(), Date.now(), 86400000);
+    const sBucket=sRes?.bucket?.[0];
+    if(sBucket){ const v=sBucket.dataset?.[0]?.point?.[0]?.value?.[0]?.intVal; if(v) state.gfitSteps=v; }
+
+    // Calories today
+    const cRes=await gfitAggregate([{dataTypeName:"com.google.calories.expended"}], midnight.getTime(), Date.now(), 86400000);
+    const cBucket=cRes?.bucket?.[0];
+    if(cBucket){ const v=cBucket.dataset?.[0]?.point?.[0]?.value?.[0]?.fpVal; if(v) state.gfitCals=Math.round(v); }
+
+    save(); renderToday(); renderLog(); toast("✅ Synced!");
+  } catch(e){ toast("❌ Sync error — check permissions"); console.error(e); }
+}
+
+async function gfitReq(url){
+  const r=await fetch(url,{headers:{Authorization:"Bearer "+state.gfitToken}});
+  return r.json();
+}
+async function gfitAggregate(aggBy, start, end, duration){
+  const r=await fetch("https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate",{
+    method:"POST", headers:{Authorization:"Bearer "+state.gfitToken,"Content-Type":"application/json"},
+    body:JSON.stringify({aggregateBy:aggBy,bucketByTime:{durationMillis:duration},startTimeMillis:start,endTimeMillis:end})
+  });
+  return r.json();
+}
+
+// ── Render Setup ───────────────────────────────────────
+function renderSetup(){
+  // Start date
+  document.getElementById("setupStartDate").value=state.startDate;
+
+  // Gym time buttons
+  const times={"08:00":"time-8am","12:00":"time-12pm","18:30":"time-6pm"};
+  Object.entries(times).forEach(([t,id])=>{
+    const b=document.getElementById(id);
+    if(b){ b.className=state.gymTime===t?"btn btn-green btn-sm":"btn btn-outline btn-sm"; b.style.flex="1"; }
+  });
+
+  // GFit
+  const sg=document.getElementById("setup-gfit-status");
+  const sd=document.getElementById("setup-gfit-data");
+  if(state.clientId && state.gfitToken && Date.now()<state.gfitExpiry){
+    sg.innerHTML=`<div class="gfit-badge connected"><span>✅</span><span>Connected</span><button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="syncGfit()">↻ Sync</button></div>`;
+    if(state.gfitWeight){ sd.style.display="block"; document.getElementById("sgf-weight").textContent=`⚖️ ${state.gfitWeight} kg`; document.getElementById("sgf-steps").textContent=state.gfitSteps?`👟 ${state.gfitSteps.toLocaleString()} steps`:""; }
+  } else if(state.clientId){
+    sg.innerHTML=`<div class="gfit-badge disconnected"><span>⚪</span><span>Session expired</span><button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="authGfit()">Reconnect</button></div>`;
+  } else {
+    sg.innerHTML=`<div class="gfit-badge disconnected"><span>⚪</span><span>Not connected</span><button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="openGfitModal()">Connect</button></div>`;
+  }
+
+  // Fitbit
+  const sfb=document.getElementById("setup-fitbit-status");
+  const sfd=document.getElementById("setup-fitbit-data");
+  const fbOk=state.fitbitToken && Date.now()<state.fitbitExpiry;
+  if(fbOk){
+    sfb.innerHTML=`<div class="gfit-badge connected"><span>✅</span><span>Connected</span><button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="syncFitbit()">↻ Sync</button></div>`;
+    if(state.fitbitRHR||state.fitbitHRV){
+      sfd.style.display="block";
+      if(state.fitbitRHR) document.getElementById("sfb-rhr").textContent=state.fitbitRHR;
+      if(state.fitbitHRV) document.getElementById("sfb-hrv").textContent=state.fitbitHRV;
+    }
+  } else if(state.fitbitClientId && state.fitbitRefresh){
+    sfb.innerHTML=`<div class="gfit-badge disconnected"><span>🔄</span><span>Session expired</span><button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="refreshFitbitToken()">Refresh</button></div>`;
+  } else if(state.fitbitClientId){
+    sfb.innerHTML=`<div class="gfit-badge disconnected"><span>⚪</span><span>Not authorised</span><button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="authFitbit()">Authorise</button></div>`;
+  } else {
+    sfb.innerHTML=`<div class="gfit-badge disconnected"><span>⚪</span><span>Not connected</span><button class="btn btn-sm btn-outline" style="margin-left:auto;padding:.3rem .6rem;font-size:.65rem" onclick="openFitbitModal()">Connect</button></div>`;
+  }
+}
+
+function setGymTime(t, btnId){
+  state.gymTime=t; save(); renderSetup();
+}
+
+// ── Google Calendar Scheduling ─────────────────────────
+async function scheduleWorkouts(){
+  if(!state.clientId){ toast("⚠️ Connect Google Fit first — Calendar uses the same login"); openGfitModal(); return; }
+  if(!state.gfitToken || Date.now()>=state.gfitExpiry){
+    toast("🔄 Please reconnect Google first…"); authGfit(); return;
+  }
+  const btn=document.getElementById("cal-btn");
+  const status=document.getElementById("cal-status");
+  btn.textContent="⏳ Creating events…"; btn.disabled=true;
+  status.textContent="";
+
+  try {
+    const pi=getPhase(), phCal=PHASE_CAL[pi];
+    const gymHour=parseInt(state.gymTime.split(":")[0]);
+    const gymMin=parseInt(state.gymTime.split(":")[1]);
+    const today=new Date(); today.setHours(0,0,0,0);
+    const events=[];
+
+    for(let week=0;week<4;week++){
+      for(let d=0;d<7;d++){
+        const date=new Date(today); date.setDate(today.getDate() + week*7 + d);
+        const dow=date.getDay(); // 0=Sun, 1=Mon...6=Sat
+        let ev=null;
+
+        if(dow===0){ // Sunday — Yoga
+          ev=makeCalEvent(date, "🧘 Yoga & Flexibility", phCal.yoga.dur,
+            8, 0,
+            `Phase ${pi+1} · ${PHASES[pi].name}\n\n${PHASE_DETAIL[pi][0]}`,
+            "#7986cb");
+
+        } else if(dow===1){ // Monday — Upper Body
+          ev=makeCalEvent(date, "💪 Upper Body Strength", phCal.strength.dur,
+            gymHour, gymMin,
+            `Phase ${pi+1} · ${PHASES[pi].name}\n\n${PHASE_DETAIL[pi][1]}`,
+            "#f6bf26");
+
+        } else if(dow===2){ // Tuesday — Light Cycling
+          ev=makeCalEvent(date, "🚴 Cycling — Cardio", phCal.cycling_tue.dur,
+            gymHour, gymMin,
+            `Phase ${pi+1} · ${PHASES[pi].name}\n\n${PHASE_DETAIL[pi][2]}`,
+            "#33b679");
+
+        } else if(dow===3){ // Wednesday — Lower Body
+          ev=makeCalEvent(date, "🦵 Lower Body Strength", phCal.strength.dur,
+            gymHour, gymMin,
+            `Phase ${pi+1} · ${PHASES[pi].name}\n\n${PHASE_DETAIL[pi][3]}`,
+            "#f6bf26");
+
+        } else if(dow===4){ // Thursday — Recovery
+          ev=makeCalEvent(date, "🚶 Active Recovery", phCal.recovery.dur,
+            gymHour, gymMin,
+            `Phase ${pi+1} · ${PHASES[pi].name}\n\n${PHASE_DETAIL[pi][4]}`,
+            "#616161");
+
+        } else if(dow===5){ // Friday — Full Body
+          ev=makeCalEvent(date, "🏋️ Full Body Strength", phCal.strength.dur,
+            gymHour, gymMin,
+            `Phase ${pi+1} · ${PHASES[pi].name}\n\n${PHASE_DETAIL[pi][5]}`,
+            "#f6bf26");
+
+        } else if(dow===6){ // Saturday — Long Ride
+          ev=makeCalEvent(date, "🚴 Long Ride", phCal.cycling_sat.dur,
+            8, 0,
+            `Phase ${pi+1} · ${PHASES[pi].name}\n\n${PHASE_DETAIL[pi][6]}`,
+            "#33b679");
+        }
+
+        if(ev) events.push(ev);
+      }
+    }
+
+    // Create all events via Calendar API
+    let created=0, failed=0;
+    for(const ev of events){
+      try{
+        const r=await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events",{
+          method:"POST",
+          headers:{Authorization:"Bearer "+state.gfitToken,"Content-Type":"application/json"},
+          body:JSON.stringify(ev)
+        });
+        if(r.ok) created++; else failed++;
+        await new Promise(res=>setTimeout(res,80)); // gentle rate limiting
+      }catch(_){ failed++; }
+    }
+
+    btn.textContent="📅 Schedule 4 Weeks"; btn.disabled=false;
+    if(created>0){
+      status.innerHTML=`<span style="color:var(--green)">✅ ${created} events added to Google Calendar!${failed?` (${failed} failed — try again)`:""}</span><br><span style="font-size:.72rem;color:var(--text3)">Open Google Calendar to see your 4-week plan</span>`;
+      toast(`✅ ${created} workout events created!`);
+    } else {
+      status.innerHTML=`<span style="color:var(--orange)">⚠️ Could not create events. Check Google Calendar access and try reconnecting.</span>`;
+    }
+  } catch(e){
+    btn.textContent="📅 Schedule 4 Weeks"; btn.disabled=false;
+    status.innerHTML=`<span style="color:var(--orange)">❌ Error: ${e.message}</span>`;
+    console.error(e);
+  }
+}
+
+function makeCalEvent(date, title, durationMins, startHour, startMin, description, colorId){
+  const start=new Date(date); start.setHours(startHour,startMin,0,0);
+  const end=new Date(start); end.setMinutes(end.getMinutes()+durationMins);
+  // Google Calendar colorId: 1=Lavender,2=Sage,3=Grape,4=Flamingo,5=Banana,6=Tangerine,7=Peacock,8=Blueberry,9=Basil,10=Tomato,11=Flamingo
+  const calColorMap={"#7986cb":"1","#33b679":"2","#f6bf26":"5","#616161":"8"};
+  return {
+    summary: title,
+    description: description,
+    colorId: calColorMap[colorId]||"1",
+    start:{ dateTime: start.toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    end:{   dateTime: end.toISOString(),   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    reminders:{ useDefault:false, overrides:[{method:"popup",minutes:30}] },
+    source:{ title:"FitTrack", url: location.href }
+  };
+}
+
+// ── Fitbit PKCE Auth ───────────────────────────────────
+function openFitbitModal(){ document.getElementById("fitbitModal").classList.add("open"); }
+function closeFitbitModal(){ document.getElementById("fitbitModal").classList.remove("open"); }
+function saveFitbitClientId(){
+  const v=document.getElementById("fitbitClientIdInput").value.trim();
+  if(!v){ toast("⚠️ Please paste your Fitbit Client ID"); return; }
+  state.fitbitClientId=v; save(); closeFitbitModal(); authFitbit();
+}
+
+// PKCE helpers
+async function generateCodeVerifier(){
+  const arr=new Uint8Array(48); crypto.getRandomValues(arr);
+  return btoa(String.fromCharCode(...arr)).replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,"");
+}
+async function generateCodeChallenge(verifier){
+  const enc=new TextEncoder().encode(verifier);
+  const buf=await crypto.subtle.digest("SHA-256",enc);
+  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,"");
+}
+
+async function authFitbit(){
+  if(!state.fitbitClientId){ openFitbitModal(); return; }
+  const verifier=await generateCodeVerifier();
+  const challenge=await generateCodeChallenge(verifier);
+  const state_param=Math.random().toString(36).slice(2);
+  sessionStorage.setItem("fitbit_verifier",verifier);
+  sessionStorage.setItem("fitbit_state",state_param);
+  const redirect=encodeURIComponent(location.href.split("?")[0]);
+  const url=`https://www.fitbit.com/oauth2/authorize`
+    +`?response_type=code`
+    +`&client_id=${state.fitbitClientId}`
+    +`&redirect_uri=${redirect}`
+    +`&scope=${encodeURIComponent(FITBIT_SCOPE)}`
+    +`&code_challenge=${challenge}`
+    +`&code_challenge_method=S256`
+    +`&state=${state_param}`;
+  location.href=url;
+}
+
+async function handleFitbitCallback(){
+  const params=new URLSearchParams(location.search);
+  const code=params.get("code");
+  const retState=params.get("state");
+  if(!code) return;
+  const verifier=sessionStorage.getItem("fitbit_verifier");
+  const savedState=sessionStorage.getItem("fitbit_state");
+  if(retState!==savedState){ toast("❌ Fitbit auth state mismatch"); return; }
+  // Clean URL
+  history.replaceState({},"",location.pathname);
+  sessionStorage.removeItem("fitbit_verifier");
+  sessionStorage.removeItem("fitbit_state");
+  toast("🔄 Completing Fitbit authorisation…");
+  try{
+    const redirect=encodeURIComponent(location.href.split("?")[0]);
+    const r=await fetch("https://api.fitbit.com/oauth2/token",{
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body:`client_id=${state.fitbitClientId}&grant_type=authorization_code&code=${code}&redirect_uri=${redirect}&code_verifier=${verifier}`
+    });
+    const d=await r.json();
+    if(d.errors){ toast("❌ Fitbit token error: "+d.errors[0]?.message); return; }
+    state.fitbitToken=d.access_token;
+    state.fitbitRefresh=d.refresh_token;
+    state.fitbitExpiry=Date.now()+(d.expires_in||28800)*1000;
+    save(); toast("✅ Fitbit connected!"); await syncFitbit(); renderToday();
+  }catch(e){ toast("❌ Fitbit auth failed"); console.error(e); }
+}
+
+async function refreshFitbitToken(){
+  if(!state.fitbitRefresh){ authFitbit(); return; }
+  try{
+    const r=await fetch("https://api.fitbit.com/oauth2/token",{
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body:`client_id=${state.fitbitClientId}&grant_type=refresh_token&refresh_token=${state.fitbitRefresh}`
+    });
+    const d=await r.json();
+    if(d.errors){ toast("⚠️ Session refresh failed, re-authorising…"); authFitbit(); return; }
+    state.fitbitToken=d.access_token;
+    state.fitbitRefresh=d.refresh_token;
+    state.fitbitExpiry=Date.now()+(d.expires_in||28800)*1000;
+    save(); await syncFitbit(); toast("✅ Fitbit refreshed!");
+  }catch(e){ toast("❌ Refresh error"); console.error(e); }
+}
+
+async function syncFitbit(){
+  if(!state.fitbitToken){ toast("⚠️ Fitbit not connected"); return; }
+  if(Date.now()>=state.fitbitExpiry){ await refreshFitbitToken(); return; }
+  toast("🔄 Syncing Fitbit…");
+  try{
+    // RHR — today's heart rate summary contains restingHeartRate
+    const hrRes=await fitbitReq(`https://api.fitbit.com/1/user/-/activities/heart/date/today/1d.json`);
+    const rhr=hrRes?.["activities-heart"]?.[0]?.value?.restingHeartRate;
+    if(rhr) state.fitbitRHR=rhr;
+
+    // HRV — daily summary
+    const today=dk();
+    const hrvRes=await fitbitReq(`https://api.fitbit.com/1/user/-/hrv/date/${today}.json`);
+    const hrv=hrvRes?.hrv?.[0]?.value?.dailyRmssd;
+    const hrvDeep=hrvRes?.hrv?.[0]?.value?.deepRmssd;
+    if(hrv) state.fitbitHRV=Math.round(hrv*10)/10;
+    if(hrvDeep) state.fitbitHRVDeep=Math.round(hrvDeep*10)/10;
+
+    save(); renderToday(); renderLog();
+    toast(`✅ Fitbit synced!${rhr?" RHR: "+rhr+" bpm":""}${hrv?" · HRV: "+Math.round(hrv)+"ms":""}`);
+  }catch(e){ toast("❌ Fitbit sync error"); console.error(e); }
+}
+
+async function fitbitReq(url){
+  const r=await fetch(url,{headers:{Authorization:"Bearer "+state.fitbitToken}});
+  if(r.status===401){ await refreshFitbitToken(); return null; }
+  return r.json();
+}
+
+// ── Init ───────────────────────────────────────────────
+load();
+// Check for Fitbit OAuth callback
+handleFitbitCallback().then(()=>renderToday());
+</script>
+</body>
+</html>
